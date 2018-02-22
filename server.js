@@ -29,20 +29,20 @@ var router = express.Router();
 
 // Create endpoint handlers for /messages
 router.route('/messages')
-  .post(messageController.postBeers)
-  .get(messageController.getBeers);
+  .post(messageController.postMessages)
+  .get(messageController.getMessages);
 
 // Create endpoint handlers for /messages/:message_id
 router.route('/messages/:message_id')
-  .get(messageController.getBeer)
-  .put(messageController.putBeer)
-  .delete(messageController.deleteBeer);
+  .get(messageController.getMessage)
+  .put(messageController.putMessage)
+  .delete(messageController.deleteMessage);
 
 // Register all our routes with /api
 app.use('/api', router);
 
 // only apply to requests that begin with /api/
-app.use('/api/', apiLimiter);
+//app.use('/api/', apiLimiter);
 
 
 // Start the server
