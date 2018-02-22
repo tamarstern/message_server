@@ -31,7 +31,8 @@ describe('Messages', () => {
   describe('/POST message', () => {
     it('it should POST a message', (done) => {
       let message = {
-          text: 'Hello world'
+          text: 'Hello world',
+          textPart: 'This is text part!'
       }
       chai.request(server)
           .post('/api/messages')
@@ -40,30 +41,37 @@ describe('Messages', () => {
           .end((err, res) => {
               res.should.have.status(200);
               res.body.should.be.a('object');
-              res.body.data.should.have.property('text').eql('Hello world');
+             res.body.data.should.have.property('text').eql('Hello world');
             done();
           });
     });
 
 });
 
-describe('/GET/:id book', () => {
+describe('/GET/:id message', () => {
     it('it should GET a message by the given id', (done) => {
-      let message = new Message({ text: "Hello world 2"});
-      message.save((err, message) => {
-          chai.request(server)
-          .get('/api/messages/' + message.id)
-          .send(message)
-          .end((err, res) => {
-              res.should.have.status(200);
-              res.body.should.be.a('object');
-              res.body.should.have.property('text').eql('Hello world 2');
-            done();
+            let message = {
+                text: 'Hello world',
+                textPart: 'This is text part!'
+            }
+            chai.request(server)
+                .post('/api/messages')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .send(message)
+                .end((err, res) => {
+                    chai.request(server)
+                    .get('/api/messages/' + res.body.data._id)
+                    .send(message)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.a('object');
+                        //res.body.should.have.property('text').eql('Hello world 2');
+                        res.body.should.have.property('parts').be.a('array');
+                        done();
           });
       });
 
     });
-});
 });
 
 describe('/PUT/:id message', () => {
@@ -98,4 +106,5 @@ describe('/DELETE/:id message', () => {
               });
         });
     });
+});
 });

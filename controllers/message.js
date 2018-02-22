@@ -1,5 +1,7 @@
 // Load required packages
 var Message = require('../models/message');
+var MessagePart = require('../models/messagePart');
+var mongoose = require('mongoose');
 
 // Create endpoint /api/Messages for POSTS
 exports.postMessages = function(req, res) {
@@ -8,13 +10,27 @@ exports.postMessages = function(req, res) {
 
   // Set the message properties that came from the POST data
   message.text = req.body.text;
+  message._id =  new mongoose.Types.ObjectId();
 
+  var messagePart  = new MessagePart();
+  messagePart.text = req.body.textPart;
+  messagePart._id =  new mongoose.Types.ObjectId();
+
+  messagePart.message = message._id;
+  message.parts.push(messagePart._id);
   // Save the message and check for errors
   message.save(function(err) {
-    if (err)
+    if (err) {
       res.send(err);
-
-    res.json({ message: 'Message added to the locker!', data: message });
+    } else {
+      messagePart.save(function (err, part) {
+        if(err) {
+          res.send(err);
+        } else {
+          res.json({ message: 'Message added to the locker!', data : message});
+        }
+      });
+    }
   });
 };
 
@@ -32,7 +48,7 @@ exports.getMessages = function(req, res) {
 // Create endpoint /api/Messages/:message_id for GET
 exports.getMessage = function(req, res) {
   // Use the Message model to find a specific message
-  Message.findById(req.params.message_id, function(err, message) {
+  Message.findById(req.params.message_id).populate('parts').exec(function(err, message) {
     if (err)
       res.send(err);
 
