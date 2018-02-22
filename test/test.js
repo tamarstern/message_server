@@ -1,7 +1,7 @@
 process.env.NODE_ENV = 'test';
 
 let mongoose = require("mongoose");
-let Beer = require('../models/beer');
+let Message = require('../models/message');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -12,11 +12,11 @@ chai.use(chaiHttp);
 
 describe('Messages', () => {
     beforeEach((done) => { //Before each test we empty the database
-        Beer.remove({}, (err) => { 
+        Message.remove({}, (err) => { 
            done();         
         });     
     });
-  describe('/GET book', () => {
+  describe('/GET message', () => {
       it('it should GET all the messages', (done) => {
         chai.request(server)
             .get('/api/messages')
@@ -28,23 +28,19 @@ describe('Messages', () => {
             });
       });
   });
-  describe('/POST beer', () => {
-    it('it should POST a beer', (done) => {
-      let beer = {
-          name: 'GoldStar',
-          type: 'Black',
-          quantity: 2
+  describe('/POST message', () => {
+    it('it should POST a message', (done) => {
+      let message = {
+          text: 'Hello world'
       }
       chai.request(server)
           .post('/api/messages')
           .set('content-type', 'application/x-www-form-urlencoded')
-          .send(beer)
+          .send(message)
           .end((err, res) => {
               res.should.have.status(200);
               res.body.should.be.a('object');
-              res.body.data.should.have.property('name').eql('GoldStar');
-              res.body.data.should.have.property('type').eql('Black');
-              res.body.data.should.have.property('quantity').eql(2);
+              res.body.data.should.have.property('text').eql('Hello world');
             done();
           });
     });
@@ -52,19 +48,16 @@ describe('Messages', () => {
 });
 
 describe('/GET/:id book', () => {
-    it('it should GET a beer by the given id', (done) => {
-      let beer = new Beer({ name: "GoldStar", type: "Black", quantity: 2 });
-      beer.save((err, beer) => {
+    it('it should GET a message by the given id', (done) => {
+      let message = new Message({ text: "Hello world 2"});
+      message.save((err, message) => {
           chai.request(server)
-          .get('/api/messages/' + beer.id)
-          .send(beer)
+          .get('/api/messages/' + message.id)
+          .send(message)
           .end((err, res) => {
               res.should.have.status(200);
               res.body.should.be.a('object');
-              res.body.should.have.property('name').eql('GoldStar');
-              res.body.should.have.property('type').eql('Black');
-              res.body.should.have.property('quantity').eql(2);
-              res.body.should.have.property('_id').eql(beer.id);
+              res.body.should.have.property('text').eql('Hello world 2');
             done();
           });
       });
@@ -73,30 +66,30 @@ describe('/GET/:id book', () => {
 });
 });
 
-describe('/PUT/:id beer', () => {
-    it('it should UPDATE a beer given the id', (done) => {
-      let beer = new Beer({ name: "GoldStar", type: "Black", quantity: 2 });
-      beer.save((err, book) => {
+describe('/PUT/:id message', () => {
+    it('it should UPDATE a message given the id', (done) => {
+      let message = new Message({ name: "GoldStar", type: "Black", quantity: 2 });
+      message.save((err, book) => {
               chai.request(server)
-              .put('/api/messages/' + beer.id)
+              .put('/api/messages/' + message.id)
               .set('content-type', 'application/x-www-form-urlencoded')
-              .send({ name: "GoldStar", type: "White", quantity: 3 })
+              .send({ text: "Hello World 3" })
               .end((err, res) => {
                   res.should.have.status(200);
                   res.body.should.be.a('object');
-                  res.body.should.have.property('quantity').eql(3);
+                  res.body.should.have.property('text').eql("Hello World 3");
                 done();
               });
         });
     });
 });
 
-describe('/DELETE/:id beer', () => {
-    it('it should DELETE a beer given the id', (done) => {
-      let beer = new Beer({ name: "GoldStar", type: "Black", quantity: 2 });
-      beer.save((err, beer) => {
+describe('/DELETE/:id message', () => {
+    it('it should DELETE a message given the id', (done) => {
+      let message = new Message({ text: "Hello world 4" });
+      message.save((err, message) => {
               chai.request(server)
-              .delete('/api/messages/' + beer.id)
+              .delete('/api/messages/' + message.id)
               .end((err, res) => {
                   res.should.have.status(200);
                   res.body.should.be.a('object');

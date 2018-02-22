@@ -48,7 +48,7 @@ exports.putMessage = function(req, res) {
       res.send(err);
 
     // Update the existing message quantity
-    message.quantity = req.body.quantity;
+    message.text = req.body.text;
 
     // Save the message and check for errors
     message.save(function(err) {
